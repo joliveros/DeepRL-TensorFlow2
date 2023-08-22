@@ -40,7 +40,7 @@ env_kwargs = dict(
     round_decimals=3,
     min_position_length = 0,
     min_flat_position_length = 0,
-    short_class_str = 'ShortRewardMinLength',
+    short_class_str = 'ShortRewardPnlDiffTrade',
     flat_class_str ='NoRewardFlatTrade'
 )
 
