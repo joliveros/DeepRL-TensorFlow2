@@ -17,17 +17,18 @@ wandb.init(name='A3C', project="deep-rl-tf2")
 parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', type=float, default=0.99)
 parser.add_argument('--update_interval', type=int, default=5)
+parser.add_argument('--num_workers', type=int, default=1)
 parser.add_argument('--actor_lr', type=float, default=0.0005)
-parser.add_argument('--critic_lr', type=float, default=0.001)
+parser.add_argument('--critic_lr', type=float, default=0.005)
 
 args = parser.parse_args()
 
 CUR_EPISODE = 0
 env_kwargs = dict(
     database_name='binance_futures',
-    depth=12,
-    sequence_length=12,
-    interval='15m',
+    depth=18,
+    sequence_length=36,
+    interval='6h',
     symbol='UNFIUSDT',
     window_size='4m',
     group_by='30s',
@@ -35,7 +36,12 @@ env_kwargs = dict(
     leverage=2,
     offset_interval='0h',
     max_negative_pnl=-0.99,
-    summary_interval=8
+    summary_interval=8,
+    round_decimals=3,
+    min_position_length = 0,
+    min_flat_position_length = 0,
+    short_class_str = 'ShortRewardMinLength',
+    flat_class_str ='NoRewardFlatTrade'
 )
 
 class Actor:
@@ -48,6 +54,7 @@ class Actor:
         self.entropy_beta = 0.01
 
     def create_model(self):
+        # split_gpu()
         # return tf.keras.Sequential([
         #     Input(self.state_dim),
         #     Dense(32, activation='relu'),
@@ -91,6 +98,8 @@ class Critic:
         self.opt = tf.keras.optimizers.Adam(args.critic_lr)
 
     def create_model(self):
+        # split_gpu()
+
         model = Model(
             input_shape=self.state_dim,
         )
@@ -130,8 +139,7 @@ class Agent:
 
         self.global_actor = Actor(self.state_dim, self.action_dim)
         self.global_critic = Critic(self.state_dim)
-        self.num_workers = 1
-        # self.num_workers = cpu_count()
+        self.num_workers = args.num_workers
 
     def train(self, max_episodes=1000):
         workers = []
@@ -252,6 +260,17 @@ class WorkerAgent(Thread):
 
     def run(self):
         self.train()
+
+def split_gpu(memory=2400):
+        physical_devices = tf.config.list_physical_devices('GPU')
+
+        if len(physical_devices) > 0 and memory > 0:
+            tf.config.set_logical_device_configuration(
+                physical_devices[0],
+                [
+                    tf.config.
+                    LogicalDeviceConfiguration(memory_limit=memory),
+                ])
 
 
 def main():
