@@ -1,6 +1,9 @@
+import alog
 import wandb
 import tensorflow as tf
+from exchange_data.models.resnet.model import Model
 from tensorflow.keras.layers import Input, Dense
+import tgym.envs
 
 import gym
 import argparse
@@ -8,6 +11,7 @@ import numpy as np
 from threading import Thread, Lock
 from multiprocessing import cpu_count
 tf.keras.backend.set_floatx('float64')
+
 wandb.init(name='A3C', project="deep-rl-tf2")
 
 parser = argparse.ArgumentParser()
@@ -19,23 +23,45 @@ parser.add_argument('--critic_lr', type=float, default=0.001)
 args = parser.parse_args()
 
 CUR_EPISODE = 0
-
+env_kwargs = dict(
+    database_name='binance_futures',
+    depth=12,
+    sequence_length=12,
+    interval='15m',
+    symbol='UNFIUSDT',
+    window_size='4m',
+    group_by='30s',
+    cache=True,
+    leverage=2,
+    offset_interval='0h',
+    max_negative_pnl=-0.99,
+    summary_interval=8
+)
 
 class Actor:
     def __init__(self, state_dim, action_dim):
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.model = self.create_model()
+        alog.info(self.model.output_shape)
         self.opt = tf.keras.optimizers.Adam(args.actor_lr)
         self.entropy_beta = 0.01
 
     def create_model(self):
-        return tf.keras.Sequential([
-            Input((self.state_dim,)),
-            Dense(32, activation='relu'),
-            Dense(16, activation='relu'),
-            Dense(self.action_dim, activation='softmax')
-        ])
+        # return tf.keras.Sequential([
+        #     Input(self.state_dim),
+        #     Dense(32, activation='relu'),
+        #     Dense(16, activation='relu'),
+        #     Dense(self.action_dim, activation='softmax')
+        # ])
+        alog.info(self.state_dim)
+
+        model = Model(
+            input_shape=self.state_dim,
+        )
+
+        print(model.summary())
+        return model
 
     def compute_loss(self, actions, logits, advantages):
         ce_loss = tf.keras.losses.SparseCategoricalCrossentropy(
@@ -65,13 +91,20 @@ class Critic:
         self.opt = tf.keras.optimizers.Adam(args.critic_lr)
 
     def create_model(self):
-        return tf.keras.Sequential([
-            Input((self.state_dim,)),
-            Dense(32, activation='relu'),
-            Dense(16, activation='relu'),
-            Dense(16, activation='relu'),
-            Dense(1, activation='linear')
-        ])
+        model = Model(
+            input_shape=self.state_dim,
+        )
+        model = Model(
+            input_shape=self.state_dim,
+        )
+
+        print(model.summary())
+
+        dense = Dense(1, activation='linear')(model.output)
+
+        return tf.keras.Model(
+            inputs=model.inputs,
+            outputs=[dense])
 
     def compute_loss(self, v_pred, td_targets):
         mse = tf.keras.losses.MeanSquaredError()
@@ -89,20 +122,22 @@ class Critic:
 
 class Agent:
     def __init__(self, env_name):
-        env = gym.make(env_name)
+        env = gym.make(env_name, **env_kwargs)
         self.env_name = env_name
-        self.state_dim = env.observation_space.shape[0]
+
+        self.state_dim = env.observation_space.shape
         self.action_dim = env.action_space.n
 
         self.global_actor = Actor(self.state_dim, self.action_dim)
         self.global_critic = Critic(self.state_dim)
-        self.num_workers = cpu_count()
+        self.num_workers = 1
+        # self.num_workers = cpu_count()
 
     def train(self, max_episodes=1000):
         workers = []
 
         for i in range(self.num_workers):
-            env = gym.make(self.env_name)
+            env = gym.make(self.env_name, **env_kwargs)
             workers.append(WorkerAgent(
                 env, self.global_actor, self.global_critic, max_episodes))
 
@@ -118,7 +153,8 @@ class WorkerAgent(Thread):
         Thread.__init__(self)
         self.lock = Lock()
         self.env = env
-        self.state_dim = self.env.observation_space.shape[0]
+
+        self.state_dim = self.env.observation_space.shape
         self.action_dim = self.env.action_space.n
 
         self.max_episodes = max_episodes
@@ -163,15 +199,17 @@ class WorkerAgent(Thread):
 
             while not done:
                 # self.env.render()
-                probs = self.actor.model.predict(
-                    np.reshape(state, [1, self.state_dim]))
+                probs = self.actor.model.predict(np.asarray([state]))
+
                 action = np.random.choice(self.action_dim, p=probs[0])
 
                 next_state, reward, done, _ = self.env.step(action)
 
-                state = np.reshape(state, [1, self.state_dim])
+                # state = np.reshape(state, [1, self.state_dim])
+                state = np.asarray([state])
                 action = np.reshape(action, [1, 1])
-                next_state = np.reshape(next_state, [1, self.state_dim])
+                next_state = np.asarray([next_state])
+                # next_state = np.reshape(next_state, [1, self.state_dim])
                 reward = np.reshape(reward, [1, 1])
 
                 state_batch.append(state)
@@ -217,7 +255,7 @@ class WorkerAgent(Thread):
 
 
 def main():
-    env_name = 'CartPole-v1'
+    env_name = 'orderbook-frame-env-v0'
     agent = Agent(env_name)
     agent.train()
 
