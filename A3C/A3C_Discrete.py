@@ -18,16 +18,16 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', type=float, default=0.99)
 parser.add_argument('--update_interval', type=int, default=5)
 parser.add_argument('--num_workers', type=int, default=1)
-parser.add_argument('--actor_lr', type=float, default=0.0005)
-parser.add_argument('--critic_lr', type=float, default=0.005)
+parser.add_argument('--actor_lr', type=float, default=0.00001)
+parser.add_argument('--critic_lr', type=float, default=0.0001)
 
 args = parser.parse_args()
 
 CUR_EPISODE = 0
 env_kwargs = dict(
     database_name='binance_futures',
-    depth=18,
-    sequence_length=36,
+    depth=24,
+    sequence_length=48,
     interval='6h',
     symbol='UNFIUSDT',
     window_size='4m',
