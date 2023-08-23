@@ -1,3 +1,5 @@
+from collections import deque
+
 import alog
 import wandb
 import tensorflow as tf
@@ -49,7 +51,6 @@ class Actor:
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.model = self.create_model()
-        alog.info(self.model.output_shape)
         self.opt = tf.keras.optimizers.Adam(args.actor_lr)
         self.entropy_beta = 0.01
 
@@ -159,10 +160,12 @@ class Agent:
 class WorkerAgent(Thread):
     def __init__(self, env, global_actor, global_critic, max_episodes):
         Thread.__init__(self)
+        self.n_steps = 0
         self.lock = Lock()
         self.env = env
 
-        self.state_dim = self.env.observation_space.shape
+        # self.state_dim = self.env.observation_space.shape
+        self.state_dim = env.observation_space.shape
         self.action_dim = self.env.action_space.n
 
         self.max_episodes = max_episodes
@@ -173,6 +176,8 @@ class WorkerAgent(Thread):
 
         self.actor.model.set_weights(self.global_actor.model.get_weights())
         self.critic.model.set_weights(self.global_critic.model.get_weights())
+
+        self.cache = deque(maxlen=1000)
 
     def n_step_td_target(self, rewards, next_v_value, done):
         td_targets = np.zeros_like(rewards)
@@ -189,10 +194,11 @@ class WorkerAgent(Thread):
         return td_targets - baselines
 
     def list_to_batch(self, list):
-        batch = list[0]
-        for elem in list[1:]:
-            batch = np.append(batch, elem, axis=0)
-        return batch
+        batch = []
+        for elem in list:
+            batch.append(elem[0])
+
+        return np.asarray(batch)
 
     def train(self):
         global CUR_EPISODE
@@ -220,14 +226,23 @@ class WorkerAgent(Thread):
                 # next_state = np.reshape(next_state, [1, self.state_dim])
                 reward = np.reshape(reward, [1, 1])
 
-                state_batch.append(state)
-                action_batch.append(action)
-                reward_batch.append(reward)
+                self.cache.append([state, action, reward])
 
-                if len(state_batch) >= args.update_interval or done:
-                    states = self.list_to_batch(state_batch)
-                    actions = self.list_to_batch(action_batch)
-                    rewards = self.list_to_batch(reward_batch)
+                if self.n_steps % args.update_interval == 0 or done:
+                    states = []
+                    actions = []
+                    rewards = []
+
+                    for i in range(0, args.update_interval):
+                        ix = np.random.randint(0, len(self.cache))
+                        state, action , reward = self.cache[ix]
+                        states.append(state[0])
+                        actions.append(action[0])
+                        rewards.append(reward[0])
+
+                    states = np.asarray(states)
+                    actions = np.asarray(actions)
+                    rewards = np.asarray(rewards)
 
                     next_v_value = self.critic.model.predict(next_state)
                     td_targets = self.n_step_td_target(
@@ -245,11 +260,7 @@ class WorkerAgent(Thread):
                         self.critic.model.set_weights(
                             self.global_critic.model.get_weights())
 
-                    state_batch = []
-                    action_batch = []
-                    reward_batch = []
-                    td_target_batch = []
-                    advatnage_batch = []
+                    self.n_steps += 1
 
                 episode_reward += reward[0][0]
                 state = next_state[0]
