@@ -232,9 +232,9 @@ class WorkerAgent(Thread):
                     states = []
                     actions = []
                     rewards = []
-
+                    cache_len = len(self.cache)
                     for i in range(0, args.update_interval):
-                        ix = np.random.randint(0, len(self.cache))
+                        ix = np.random.randint(0, cache_len)
                         state, action , reward = self.cache[ix]
                         states.append(state[0])
                         actions.append(action[0])
