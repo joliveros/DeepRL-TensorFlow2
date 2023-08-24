@@ -1,11 +1,11 @@
+#!/usr/bin/env python
 from collections import deque
-
-import alog
-import wandb
-import tensorflow as tf
 from exchange_data.models.resnet.model import Model
 from tensorflow.keras.layers import Input, Dense
+import alog
+import tensorflow as tf
 import tgym.envs
+import wandb
 
 import gym
 import argparse
@@ -42,8 +42,8 @@ env_kwargs = dict(
     round_decimals=3,
     min_position_length = 0,
     min_flat_position_length = 0,
-    short_class_str = 'ShortRewardPnlDiffTrade',
-    flat_class_str ='NoRewardFlatTrade'
+    short_class_str = 'ShortTrade',
+    flat_class_str ='FlatTrade'
 )
 
 class Actor:
