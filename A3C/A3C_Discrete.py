@@ -178,7 +178,7 @@ class WorkerAgent(Thread):
         self.actor.model.set_weights(self.global_actor.model.get_weights())
         self.critic.model.set_weights(self.global_critic.model.get_weights())
 
-        self.cache = deque(maxlen=1000)
+        self.cache = deque(maxlen=1000*20)
 
     def n_step_td_target(self, rewards, next_v_value, done):
         td_targets = np.zeros_like(rewards)
