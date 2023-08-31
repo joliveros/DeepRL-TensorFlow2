@@ -20,6 +20,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', type=float, default=0.99)
 parser.add_argument('--update_interval', type=int, default=5)
 parser.add_argument('--num_workers', type=int, default=1)
+parser.add_argument('--batch_size', type=int, default=4)
 parser.add_argument('--actor_lr', type=float, default=0.00005)
 parser.add_argument('--critic_lr', type=float, default=0.0005)
 
@@ -233,7 +234,7 @@ class WorkerAgent(Thread):
                     actions = []
                     rewards = []
                     cache_len = len(self.cache)
-                    for i in range(0, 2):
+                    for i in range(0, args.batch_size):
                         ix = np.random.randint(0, cache_len)
                         state, action , reward = self.cache[ix]
                         states.append(state[0])
