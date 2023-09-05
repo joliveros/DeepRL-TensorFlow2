@@ -256,10 +256,15 @@ class WorkerAgent(Thread):
                         critic_loss = self.global_critic.train(
                             states, td_targets)
 
+                        alog.debug([actor_loss, critic_loss])
+
                         self.actor.model.set_weights(
                             self.global_actor.model.get_weights())
                         self.critic.model.set_weights(
                             self.global_critic.model.get_weights())
+
+                        wandb.log(dict(actor_loss=actor_loss.numpy(),
+                                       critic_loss=critic_loss.numpy()))
 
                     self.n_steps += 1
 
