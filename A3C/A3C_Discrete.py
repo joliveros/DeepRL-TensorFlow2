@@ -43,8 +43,8 @@ env_kwargs = dict(
     round_decimals=3,
     min_position_length = 0,
     min_flat_position_length = 0,
-    short_class_str = 'ShortTrade',
-    flat_class_str ='FlatTrade'
+    short_class_str = 'ShortRewardPnlDiffTrade',
+    flat_class_str ='NoRewardFlatTrade'
 )
 
 class Actor:
@@ -178,7 +178,7 @@ class WorkerAgent(Thread):
         self.actor.model.set_weights(self.global_actor.model.get_weights())
         self.critic.model.set_weights(self.global_critic.model.get_weights())
 
-        self.cache = deque(maxlen=1000*20)
+        self.cache = deque(maxlen=1000*2)
 
     def n_step_td_target(self, rewards, next_v_value, done):
         td_targets = np.zeros_like(rewards)
