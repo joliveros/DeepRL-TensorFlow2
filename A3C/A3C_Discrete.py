@@ -7,7 +7,7 @@ from A3C.agent import Agent
 
 tf.keras.backend.set_floatx('float64')
 
-wandb.init(name='A3C', project="deep-rl-tf2")
+wandb.init(name='A3C', project="deep-rl-tf2", mode='online')
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', type=float, default=0.99)
@@ -34,7 +34,7 @@ env_kwargs = dict(
     round_decimals=3,
     min_position_length = 0,
     min_flat_position_length = 0,
-    min_change=-0.05,
+    min_change=-0.01,
     short_class_str = 'ShortRewardPnlDiffTrade',
     flat_class_str ='NoRewardFlatTrade',
     random_frame_start=True

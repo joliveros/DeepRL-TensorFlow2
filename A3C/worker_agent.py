@@ -69,21 +69,21 @@ class WorkerAgent(Thread):
             state = self.env.reset()
 
             while not done:
-                # self.env.render()
                 probs = self.actor.model.predict(np.asarray([state]))
 
                 action = np.random.choice(self.action_dim, p=probs[0])
 
                 next_state, reward, done, _ = self.env.step(action)
 
-                # state = np.reshape(state, [1, self.state_dim])
                 state = np.asarray([state])
                 action = np.reshape(action, [1, 1])
                 next_state = np.asarray([next_state])
-                # next_state = np.reshape(next_state, [1, self.state_dim])
                 reward = np.reshape(reward, [1, 1])
 
                 self.cache.append([state, action, reward])
+
+                if done:
+                    wandb.log(dict(capital=_['capital']))
 
                 if self.n_steps % self.update_interval == 0 or done:
                     states = []
@@ -111,8 +111,6 @@ class WorkerAgent(Thread):
                             states, actions, advantages)
                         critic_loss = self.global_critic.train(
                             states, td_targets)
-
-                        alog.debug([actor_loss, critic_loss])
 
                         self.actor.model.set_weights(
                             self.global_actor.model.get_weights())
