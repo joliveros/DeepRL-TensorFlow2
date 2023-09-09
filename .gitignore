@@ -3,3 +3,6 @@
 **/.vscode/
 **/wandb
 .idea
+*.egg-info
+build
+dist
