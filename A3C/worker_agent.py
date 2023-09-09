@@ -57,7 +57,7 @@ class WorkerAgent(Thread):
 
         return np.asarray(batch)
 
-    def train(self):
+    def train(self, *args, **kwargs):
         global CUR_EPISODE
 
         while self.max_episodes >= CUR_EPISODE:

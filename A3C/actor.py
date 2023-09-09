@@ -2,28 +2,20 @@ import alog
 import tensorflow as tf
 from exchange_data.models.resnet.model import Model
 
-
 class Actor:
     def __init__(self, state_dim, action_dim, actor_lr, **kwargs):
         self.actor_lr = actor_lr
         self.state_dim = state_dim
         self.action_dim = action_dim
-        self.model = self.create_model()
+        self.model = self.create_model(**kwargs)
         self.opt = tf.keras.optimizers.Adam(self.actor_lr)
         self.entropy_beta = 0.01
 
-    def create_model(self):
-        # split_gpu()
-        # return tf.keras.Sequential([
-        #     Input(self.state_dim),
-        #     Dense(32, activation='relu'),
-        #     Dense(16, activation='relu'),
-        #     Dense(self.action_dim, activation='softmax')
-        # ])
-        alog.info(self.state_dim)
+    def create_model(self, **kwargs):
 
         model = Model(
             input_shape=self.state_dim,
+            **kwargs
         )
 
         print(model.summary())

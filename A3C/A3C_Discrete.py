@@ -1,13 +1,16 @@
 #!/usr/bin/env python
+
+from A3C.tuner import Tuner
 import alog
 import tensorflow as tf
 import wandb
 import argparse
-from A3C.agent import Agent
+
+
 
 tf.keras.backend.set_floatx('float64')
 
-wandb.init(name='A3C', project="deep-rl-tf2", mode='online')
+wandb.init(name='A3C', project="deep-rl-tf2", mode='disabled')
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', type=float, default=0.99)
@@ -44,8 +47,11 @@ env_kwargs = dict(
 def main():
     env_name = 'orderbook-frame-env-v0'
     args = parser.parse_args()
-    agent = Agent(env_name, env_kwargs, **args.__dict__)
-    agent.train()
+
+    alog.debug(args)
+
+    Tuner(env_name, env_kwargs, **args.__dict__, **env_kwargs)
+
 
 
 if __name__ == "__main__":

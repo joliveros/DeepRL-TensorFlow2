@@ -6,17 +6,13 @@ class Critic:
     def __init__(self, state_dim, critic_lr, **kwargs):
         self.critic_lr = critic_lr
         self.state_dim = state_dim
-        self.model = self.create_model()
+        self.model = self.create_model(**kwargs)
         self.opt = tf.keras.optimizers.Adam(self.critic_lr)
 
-    def create_model(self):
-        # split_gpu()
-
+    def create_model(self, **kwargs):
         model = Model(
             input_shape=self.state_dim,
-        )
-        model = Model(
-            input_shape=self.state_dim,
+            **kwargs
         )
 
         print(model.summary())
