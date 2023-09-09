@@ -43,8 +43,10 @@ env_kwargs = dict(
     round_decimals=3,
     min_position_length = 0,
     min_flat_position_length = 0,
+    min_change=-0.05,
     short_class_str = 'ShortRewardPnlDiffTrade',
-    flat_class_str ='NoRewardFlatTrade'
+    flat_class_str ='NoRewardFlatTrade',
+    random_frame_start=True
 )
 
 class Actor:
@@ -143,7 +145,7 @@ class Agent:
         self.global_critic = Critic(self.state_dim)
         self.num_workers = args.num_workers
 
-    def train(self, max_episodes=1000):
+    def train(self, max_episodes=10**10):
         workers = []
 
         for i in range(self.num_workers):
