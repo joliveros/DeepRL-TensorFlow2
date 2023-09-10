@@ -18,6 +18,8 @@ class WorkerAgent(Thread):
                  env_kwargs=None, **kwargs):
 
         Thread.__init__(self)
+        global CUR_EPISODE
+        CUR_EPISODE=0
 
         self.batch_size = batch_size
         self.gamma = gamma
