@@ -26,8 +26,8 @@ class Agent:
     def train(self, trial: Trial, *args, **kwargs):
         self.trial = trial
         hparams = dict(
-            block_kernel=trial.suggest_int('block_kernel', 1, 7),
-            kernel_size=trial.suggest_int('kernel_size', 1, 7),
+            block_kernel=trial.suggest_int('block_kernel', 1, 4),
+            kernel_size=trial.suggest_int('kernel_size', 1, 4),
             actor_lr=trial.suggest_float('actor_lr', 0.0000001, 0.001),
             critic_lr = trial.suggest_float('critic_lr', 0.0000001, 0.001)
         )
