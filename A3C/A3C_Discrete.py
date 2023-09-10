@@ -4,9 +4,11 @@ from A3C.tuner import Tuner
 import alog
 import tensorflow as tf
 import wandb
+import sec
 import argparse
 
-
+WANDB_API_KEY= sec.load('WANDB_API_KEY', lowercase=False)
+wandb.login(key=WANDB_API_KEY)
 
 tf.keras.backend.set_floatx('float64')
 
