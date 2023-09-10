@@ -55,3 +55,5 @@ class Agent:
 
         for worker in workers:
             worker.join()
+
+        wandb.finish()
