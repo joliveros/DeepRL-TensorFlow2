@@ -17,4 +17,4 @@ class Tuner(StudyWrapper):
 
         self.agent = Agent(env_name, env_kwargs, **kwargs)
 
-        self.study.optimize(self.agent.train, n_trials=1000)
+        self.study.optimize(self.agent.train, n_trials=1)
