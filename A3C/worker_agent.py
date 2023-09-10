@@ -4,6 +4,7 @@ from threading import Thread, Lock
 import alog
 import numpy as np
 import wandb
+import gym
 
 from A3C.actor import Actor
 from A3C.critic import Critic
@@ -11,18 +12,21 @@ from A3C.critic import Critic
 CUR_EPISODE = 0
 
 class WorkerAgent(Thread):
-    def __init__(self, env, global_actor, global_critic, max_episodes,
-                 gamma, update_interval, batch_size, **kwargs):
+    def __init__(self, global_actor, global_critic,
+                 max_episodes,
+                 gamma, update_interval, batch_size, env_name=None,
+                 env_kwargs=None, **kwargs):
+
         Thread.__init__(self)
+
         self.batch_size = batch_size
         self.gamma = gamma
         self.update_interval = update_interval
         self.n_steps = 0
         self.lock = Lock()
-        self.env = env
+        self.env = gym.make(env_name, **env_kwargs)
 
-        # self.state_dim = self.env.observation_space.shape
-        self.state_dim = env.observation_space.shape
+        self.state_dim = self.env.observation_space.shape
         self.action_dim = self.env.action_space.n
 
         self.max_episodes = max_episodes

@@ -42,9 +42,13 @@ class Agent:
         workers = []
 
         for i in range(self.num_workers):
-            env = gym.make(self.env_name, **self.env_kwargs)
             workers.append(WorkerAgent(
-                env, self.global_actor, self.global_critic, self.max_episodes, **self.kwargs))
+                self.global_actor,
+                self.global_critic,
+                self.max_episodes,
+                env_name=self.env_name,
+                env_kwargs=self.env_kwargs,
+                **self.kwargs))
 
         for worker in workers:
             worker.start()
