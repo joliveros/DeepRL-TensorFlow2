@@ -10,7 +10,9 @@ import tgym.envs
 
 
 class Agent:
-    def __init__(self, env_name, env_kwargs, num_workers, **kwargs):
+    def __init__(self, env_name, env_kwargs, num_workers,
+                 max_episodes, **kwargs):
+        self.max_episodes = max_episodes
         self.trial = None
         self.kwargs = kwargs
         self.env_kwargs = env_kwargs
@@ -37,14 +39,12 @@ class Agent:
                                   **self.kwargs)
         self.global_critic = Critic(self.state_dim, **self.kwargs)
 
-        max_episodes = 100
-
         workers = []
 
         for i in range(self.num_workers):
             env = gym.make(self.env_name, **self.env_kwargs)
             workers.append(WorkerAgent(
-                env, self.global_actor, self.global_critic, max_episodes, **self.kwargs))
+                env, self.global_actor, self.global_critic, self.max_episodes, **self.kwargs))
 
         for worker in workers:
             worker.start()
