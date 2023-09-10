@@ -3,7 +3,7 @@ from optuna import Trial
 from A3C.actor import Actor
 from A3C.critic import Critic
 from A3C.worker_agent import WorkerAgent
-
+import wandb
 import alog
 import gym
 import tgym.envs
@@ -19,6 +19,8 @@ class Agent:
         self.state_dim = env.observation_space.shape
         self.action_dim = env.action_space.n
         self.num_workers = num_workers
+        wandb.init(name='A3C', project="deep-rl-tf2", mode='online')
+
 
     def train(self, trial: Trial, *args, **kwargs):
         self.trial = trial

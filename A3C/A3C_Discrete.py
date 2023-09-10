@@ -10,8 +10,6 @@ import argparse
 
 tf.keras.backend.set_floatx('float64')
 
-wandb.init(name='A3C', project="deep-rl-tf2", mode='disabled')
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', type=float, default=0.99)
 parser.add_argument('--update_interval', type=int, default=5)
