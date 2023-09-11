@@ -49,11 +49,7 @@ def main():
     env_name = 'orderbook-frame-env-v0'
     args = parser.parse_args()
 
-    alog.debug(args)
-
     Tuner(env_name, env_kwargs, **args.__dict__, **env_kwargs)
-
-
 
 if __name__ == "__main__":
     main()

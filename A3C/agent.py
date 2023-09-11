@@ -25,6 +25,8 @@ class Agent:
 
     def train(self, trial: Trial, *args, **kwargs):
         self.trial = trial
+        self.trial.set_user_attr('run_id', trial.run.id)
+
         hparams = dict(
             block_kernel=trial.suggest_int('block_kernel', 1, 4),
             kernel_size=trial.suggest_int('kernel_size', 1, 4),
