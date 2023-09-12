@@ -20,6 +20,7 @@ class WorkerAgent(Thread):
                  env_kwargs=None, trial=None, **kwargs):
 
         Thread.__init__(self)
+        self.capital = None
         global CUR_EPISODE
         CUR_EPISODE=0
 
@@ -85,7 +86,7 @@ class WorkerAgent(Thread):
 
                 next_state, reward, done, _ = self.env.step(action)
 
-                capital = _['capital']
+                self.capital = _['capital']
 
                 state = np.asarray([state])
                 action = np.reshape(action, [1, 1])
@@ -148,4 +149,4 @@ class WorkerAgent(Thread):
         wandb.finish(quiet=True)
 
     def run(self):
-        self.train()
+        return self.train()

@@ -40,7 +40,7 @@ env_kwargs = dict(
     min_change=-0.01,
     short_class_str='ShortRewardPnlDiffTrade',
     flat_class_str='NoRewardFlatTrade',
-    random_frame_start=True
+    random_frame_start=True,
 )
 
 

@@ -1,3 +1,5 @@
+from statistics import mean
+
 from optuna import Trial
 
 from A3C.actor import Actor
@@ -12,6 +14,8 @@ import tgym.envs
 class Agent:
     def __init__(self, env_name, env_kwargs, num_workers,
                  max_episodes, **kwargs):
+        self.global_critic = None
+        self.global_actor = None
         self.max_episodes = max_episodes
         self.trial = None
         self.kwargs = kwargs
@@ -63,7 +67,12 @@ class Agent:
         for worker in workers:
             worker.start()
 
+        capital = []
+
         for worker in workers:
             worker.join()
+            capital.append(worker.capital)
 
         wandb.finish()
+
+        return mean(capital)
