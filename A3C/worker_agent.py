@@ -95,6 +95,9 @@ class WorkerAgent(Thread):
 
                 self.cache.append([state, action, reward])
 
+                if done:
+                    wandb.log({'capital': self.capital})
+
                 if self.n_steps % self.update_interval == 0 or done:
                     states = []
                     actions = []
