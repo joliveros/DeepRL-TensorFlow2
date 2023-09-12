@@ -69,11 +69,19 @@ class Agent:
             worker.start()
 
         capital = []
+        trades = []
 
         for worker in workers:
             worker.join()
-            capital.append(worker.capital)
+            capital.append(worker.env_state['capital'])
+            trades.append([trade for trade in
+                           worker.env_state['trades'] if trade.pnl > 0])
 
         wandb.finish()
 
-        return mean(capital)
+        if len(trades) > 0:
+            trade_value = len(trades) ** (1/24)
+        else:
+            trade_value = 0
+
+        return mean(capital) + trade_value

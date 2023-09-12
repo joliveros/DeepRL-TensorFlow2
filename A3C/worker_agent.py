@@ -20,10 +20,11 @@ class WorkerAgent(Thread):
                  env_kwargs=None, trial=None, **kwargs):
 
         Thread.__init__(self)
-        self.capital = None
+
         global CUR_EPISODE
         CUR_EPISODE=0
 
+        self.env_state = dict()
         self.trial = trial
         self.batch_size = batch_size
         self.gamma = gamma
@@ -86,7 +87,7 @@ class WorkerAgent(Thread):
 
                 next_state, reward, done, _ = self.env.step(action)
 
-                self.capital = _['capital']
+                self.env_state = _
 
                 state = np.asarray([state])
                 action = np.reshape(action, [1, 1])
@@ -96,7 +97,7 @@ class WorkerAgent(Thread):
                 self.cache.append([state, action, reward])
 
                 if done:
-                    wandb.log({'capital': self.capital})
+                    wandb.log({'capital': self.env_state['capital']})
 
                 if self.n_steps % self.update_interval == 0 or done:
                     states = []
