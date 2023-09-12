@@ -81,6 +81,9 @@ class WorkerAgent(Thread):
             state = self.env.reset()
 
             while not done:
+                if state is None:
+                    state = np.zeros(self.state_dim)
+
                 probs = self.actor.model.predict(np.asarray([state]))
 
                 action = np.random.choice(self.action_dim, p=probs[0])
@@ -148,7 +151,7 @@ class WorkerAgent(Thread):
                 wandb.finish(quiet=True)
                 raise TrialPruned()
 
-        wandb.run.summary["final capital"] = capital
+        wandb.run.summary["final capital"] = self.env_state['capital']
         wandb.run.summary["state"] = "completed"
         wandb.finish(quiet=True)
 

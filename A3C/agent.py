@@ -13,7 +13,8 @@ import tgym.envs
 
 class Agent:
     def __init__(self, env_name, env_kwargs, num_workers,
-                 max_episodes, **kwargs):
+                 max_episodes, offline, **kwargs):
+        self.offline = offline
         self.global_critic = None
         self.global_actor = None
         self.max_episodes = max_episodes
@@ -46,7 +47,7 @@ class Agent:
             name='A3C',
             project="deep-rl-tf2",
             config=config,
-            mode='online'
+            mode='offline' if self.offline else 'online'
         )
 
         self.global_actor = Actor(self.state_dim, self.action_dim,

@@ -20,6 +20,7 @@ parser.add_argument('--num_workers', type=int, default=1)
 parser.add_argument('--batch_size', type=int, default=4)
 parser.add_argument('--actor_lr', type=float, default=0.00005)
 parser.add_argument('--critic_lr', type=float, default=0.0005)
+parser.add_argument('--offline', '-o', action='store_true')
 
 env_kwargs = dict(
     database_name='binance_futures',
