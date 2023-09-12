@@ -15,7 +15,7 @@ services:
             - ${HOME}/.exchange-data/:/home/joliveros/.exchange-data/
         command: bash -c "source ~/.bashrc && 
           ./A3C/A3C_Discrete.py --update_interval 20 --num_workers 3 \
-          --batch_size 1 --max_episodes 50"
+          --batch_size 9 --max_episodes 100"
         environment:
             - LOG_LEVEL=DEBUG
             - CUDA_VISIBLE_DEVICES=0

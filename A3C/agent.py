@@ -28,15 +28,6 @@ class Agent:
 
     def train(self, trial: Trial, *args, **kwargs):
         self.trial = trial
-        config = dict(trial.params)
-        config["trial.number"] = trial.number
-
-        wandb.init(
-            name='A3C',
-            project="deep-rl-tf2",
-            config=config,
-            mode='online'
-        )
 
         hparams = dict(
             block_kernel=trial.suggest_int('block_kernel', 1, 4),
@@ -47,6 +38,16 @@ class Agent:
 
         for key in hparams.keys():
             self.kwargs[key] = hparams[key]
+
+        config = dict(trial.params)
+        config["trial.number"] = trial.number
+
+        wandb.init(
+            name='A3C',
+            project="deep-rl-tf2",
+            config=config,
+            mode='online'
+        )
 
         self.global_actor = Actor(self.state_dim, self.action_dim,
                                   **self.kwargs)
