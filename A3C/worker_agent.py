@@ -3,8 +3,10 @@ from threading import Thread, Lock
 
 import alog
 import numpy as np
+import optuna
 import wandb
 import gym
+from optuna import TrialPruned
 
 from A3C.actor import Actor
 from A3C.critic import Critic
@@ -15,12 +17,13 @@ class WorkerAgent(Thread):
     def __init__(self, global_actor, global_critic,
                  max_episodes,
                  gamma, update_interval, batch_size, env_name=None,
-                 env_kwargs=None, **kwargs):
+                 env_kwargs=None, trial=None, **kwargs):
 
         Thread.__init__(self)
         global CUR_EPISODE
         CUR_EPISODE=0
 
+        self.trial = trial
         self.batch_size = batch_size
         self.gamma = gamma
         self.update_interval = update_interval
@@ -65,6 +68,7 @@ class WorkerAgent(Thread):
 
     def train(self, *args, **kwargs):
         global CUR_EPISODE
+        capital = None
 
         while self.max_episodes >= CUR_EPISODE:
             state_batch = []
@@ -81,15 +85,14 @@ class WorkerAgent(Thread):
 
                 next_state, reward, done, _ = self.env.step(action)
 
+                capital = _['capital']
+
                 state = np.asarray([state])
                 action = np.reshape(action, [1, 1])
                 next_state = np.asarray([next_state])
                 reward = np.reshape(reward, [1, 1])
 
                 self.cache.append([state, action, reward])
-
-                if done:
-                    wandb.log(dict(capital=_['capital']))
 
                 if self.n_steps % self.update_interval == 0 or done:
                     states = []
@@ -134,6 +137,15 @@ class WorkerAgent(Thread):
             print('EP{} EpisodeReward={}'.format(CUR_EPISODE, episode_reward))
             wandb.log({'Reward': episode_reward})
             CUR_EPISODE += 1
+
+            if self.trial.should_prune():
+                wandb.run.summary["state"] = "pruned"
+                wandb.finish(quiet=True)
+                raise TrialPruned()
+
+        wandb.run.summary["final capital"] = capital
+        wandb.run.summary["state"] = "completed"
+        wandb.finish(quiet=True)
 
     def run(self):
         self.train()

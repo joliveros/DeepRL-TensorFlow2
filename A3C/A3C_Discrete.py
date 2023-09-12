@@ -7,7 +7,7 @@ import wandb
 import sec
 import argparse
 
-WANDB_API_KEY= sec.load('WANDB_API_KEY', lowercase=False)
+WANDB_API_KEY = sec.load('WANDB_API_KEY', lowercase=False)
 wandb.login(key=WANDB_API_KEY)
 
 tf.keras.backend.set_floatx('float64')
@@ -20,7 +20,6 @@ parser.add_argument('--num_workers', type=int, default=1)
 parser.add_argument('--batch_size', type=int, default=4)
 parser.add_argument('--actor_lr', type=float, default=0.00005)
 parser.add_argument('--critic_lr', type=float, default=0.0005)
-
 
 env_kwargs = dict(
     database_name='binance_futures',
@@ -36,11 +35,11 @@ env_kwargs = dict(
     max_negative_pnl=-0.99,
     summary_interval=8,
     round_decimals=3,
-    min_position_length = 0,
-    min_flat_position_length = 0,
+    min_position_length=0,
+    min_flat_position_length=0,
     min_change=-0.01,
-    short_class_str = 'ShortRewardPnlDiffTrade',
-    flat_class_str ='NoRewardFlatTrade',
+    short_class_str='ShortRewardPnlDiffTrade',
+    flat_class_str='NoRewardFlatTrade',
     random_frame_start=True
 )
 
@@ -50,6 +49,7 @@ def main():
     args = parser.parse_args()
 
     Tuner(env_name, env_kwargs, **args.__dict__, **env_kwargs)
+
 
 if __name__ == "__main__":
     main()
