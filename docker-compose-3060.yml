@@ -14,7 +14,7 @@ services:
         volumes:
             - ${HOME}/.exchange-data/:/home/joliveros/.exchange-data/
         command: bash -c "source ~/.bashrc && 
-          ./A3C/A3C_Discrete.py --update_interval 9 --num_workers 3 \
+          ./A3C/A3C_Discrete.py --update_interval 1 --num_workers 3 \
           --batch_size 3 --max_episodes 100"
         environment:
             - LOG_LEVEL=DEBUG
