@@ -27,6 +27,8 @@ class Agent:
         self.action_dim = env.action_space.n
         self.num_workers = num_workers
 
+        env.close()
+
     def train(self, trial: Trial, *args, **kwargs):
         self.trial = trial
 

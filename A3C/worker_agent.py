@@ -86,7 +86,10 @@ class WorkerAgent(Thread):
 
                 probs = self.actor.model.predict(np.asarray([state]))
 
-                action = np.random.choice(self.action_dim, p=probs[0])
+                action = np.argmax(probs[0])
+
+                # action = np.random.choice(self.action_dim, p=probs[0])
+                # alog.info((action, probs))
 
                 next_state, reward, done, _ = self.env.step(action)
 
@@ -134,8 +137,8 @@ class WorkerAgent(Thread):
                         self.critic.model.set_weights(
                             self.global_critic.model.get_weights())
 
-                        wandb.log(dict(actor_loss=actor_loss.numpy(),
-                                       critic_loss=critic_loss.numpy()))
+                    wandb.log(dict(actor_loss=actor_loss.numpy(),
+                                   critic_loss=critic_loss.numpy()))
 
                     self.n_steps += 1
 
