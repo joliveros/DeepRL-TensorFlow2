@@ -16,7 +16,9 @@ CUR_EPISODE = 0
 class WorkerAgent(Thread):
     def __init__(self, global_actor, global_critic,
                  max_episodes,
-                 gamma, update_interval, batch_size, env_name=None,
+                 gamma, update_interval, batch_size,
+                 cache_len=1000,
+                 env_name=None,
                  env_kwargs=None, trial=None, **kwargs):
 
         Thread.__init__(self)
@@ -45,7 +47,7 @@ class WorkerAgent(Thread):
         self.actor.model.set_weights(self.global_actor.model.get_weights())
         self.critic.model.set_weights(self.global_critic.model.get_weights())
 
-        self.cache = deque(maxlen=1000*2)
+        self.cache = deque(maxlen=cache_len)
 
     def n_step_td_target(self, rewards, next_v_value, done):
         td_targets = np.zeros_like(rewards)

@@ -36,7 +36,8 @@ class Agent:
             block_kernel=trial.suggest_int('block_kernel', 1, 4),
             kernel_size=trial.suggest_int('kernel_size', 1, 4),
             actor_lr=trial.suggest_float('actor_lr', 0.0000001, 0.001),
-            critic_lr=trial.suggest_float('critic_lr', 0.0000001, 0.001)
+            critic_lr=trial.suggest_float('critic_lr', 0.0000001, 0.001),
+            cache_len=trial.suggest_int('cache_len', 10, 1000)
         )
 
         for key in hparams.keys():
