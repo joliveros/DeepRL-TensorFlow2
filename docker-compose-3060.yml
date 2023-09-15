@@ -19,6 +19,7 @@ services:
         environment:
             - LOG_LEVEL=DEBUG
             - CUDA_VISIBLE_DEVICES=0
+            - WANDB_DISABLE_SERVICE=True
         networks:
             - public
         depends_on:
