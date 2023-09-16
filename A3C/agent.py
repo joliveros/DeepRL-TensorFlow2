@@ -21,7 +21,10 @@ class Agent:
         self.trial = None
         self.kwargs = kwargs
         self.env_kwargs = env_kwargs
-        env = gym.make(env_name, **env_kwargs)
+        env = gym.make(env_name,
+                       worker_name='agent',
+                       custom_summary_keys=['worker_name'],
+                       **env_kwargs)
         self.env_name = env_name
         self.state_dim = env.observation_space.shape
         self.action_dim = env.action_space.n
@@ -67,6 +70,7 @@ class Agent:
                 trial=trial,
                 env_name=self.env_name,
                 env_kwargs=self.env_kwargs,
+                name=f'worker_{i}',
                 **self.kwargs))
 
         for worker in workers:

@@ -19,9 +19,10 @@ class WorkerAgent(Thread):
                  gamma, update_interval, batch_size,
                  cache_len=1000,
                  env_name=None,
+                 name=None,
                  env_kwargs=None, trial=None, **kwargs):
 
-        Thread.__init__(self)
+        Thread.__init__(self, name=name)
 
         global CUR_EPISODE
         CUR_EPISODE=0
@@ -33,7 +34,10 @@ class WorkerAgent(Thread):
         self.update_interval = update_interval
         self.n_steps = 0
         self.lock = Lock()
-        self.env = gym.make(env_name, **env_kwargs)
+        self.env = gym.make(env_name,
+                            worker_name=self.name,
+                            custom_summary_keys=['worker_name'],
+                            **env_kwargs)
 
         self.state_dim = self.env.observation_space.shape
         self.action_dim = self.env.action_space.n
