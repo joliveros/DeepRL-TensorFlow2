@@ -1,10 +1,20 @@
 from copy import copy
+from dataclasses import dataclass
 
 import alog
 import gym
 import numpy as np
 import wandb
 from optuna import TrialPruned, Trial
+
+@dataclass
+class EvalStats:
+    capital: float
+    pos_trades: int
+
+    @property
+    def trade_capital_ratio(self):
+       return (self.capital + (self.pos_trades ** 1 / 24) - 1)
 
 
 class EvalAgent:
@@ -21,7 +31,7 @@ class EvalAgent:
         self._env_kwargs = None
         self.steps = 0
         self.actor = actor
-        self.stats = None
+        self.stats: EvalStats = None
         self.test_interval = test_interval
 
         self.env_kwargs = copy(env_kwargs)
@@ -82,19 +92,13 @@ class EvalAgent:
             if done:
                 eval_done = done
                 pos_trades = [t for t in self.env_state['trades'] if t.pnl > 0]
-                stats = dict(capital=self.env_state['capital'],
+                self.stats = EvalStats(capital=self.env_state['capital'],
                              pos_trades=len(pos_trades))
-                stats['trade_capital_ratio'] = stats['capital'] * (stats['pos_trades'] ** 1/24)
+                wandb.log(self.stats)
 
-                self.stats = stats
-                wandb.log(stats)
-
-                self.trial.report(stats['trade_capital_ratio'], step)
+                self.trial.report(self.stats.trade_capital_ratio, step)
 
                 if self.trial.should_prune():
                     wandb.run.summary["state"] = "pruned"
                     wandb.finish(quiet=True)
                     raise TrialPruned()
-
-
-

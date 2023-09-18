@@ -84,7 +84,8 @@ class Agent:
         for worker in workers:
             worker.join()
             if worker.eval_agent:
-                result = worker.eval_agent.stats['trade_capital_ratio']
+                result = worker.eval_agent\
+                    .stats.trade_capital_ratio
 
         wandb.finish()
 
