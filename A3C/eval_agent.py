@@ -9,17 +9,15 @@ class EvalAgent:
     def __init__(
             self,
             test_interval,
-            steps,
             env_name,
             env_kwargs,
             actor,
             **kwargs):
 
         self._env_kwargs = None
-        self._steps = 0
+        self.steps = 0
         self.actor = actor
         self.stats = None
-        self.steps = steps
         self.test_interval = test_interval
 
         self.env_kwargs = copy(env_kwargs)
@@ -31,6 +29,9 @@ class EvalAgent:
             custom_summary_keys=['worker_name'],
             **env_kwargs
         )
+        self.state_dim = self.env.observation_space.shape
+        self.action_dim = self.env.action_space.n
+
 
     def set_env_kwargs(self, value):
         self._env_kwargs = self.set_offset_interval(value)
@@ -51,26 +52,34 @@ class EvalAgent:
         return env_kwargs
 
     def reset(self):
-        self._steps = 0
+        self.steps = 0
         return self.env.reset()
 
     def eval(self):
         state = self.env.reset()
+        eval_done = False
 
-        while self._steps < self.steps:
+        while not eval_done:
+            if state is None:
+                state = np.zeros(self.state_dim)
+                alog.debug('## state is None ##')
+
             probs = self.actor.model.predict(np.asarray([state]))
 
             action = np.argmax(probs[0])
 
             next_state, reward, done, _ = self.env.step(action)
 
-            state = next_state[0]
+            state = next_state
 
             self.env_state = _
+            self.steps += 1
 
             if done:
+                eval_done = done
+                pos_trades = [t for t in self.env_state['trades'] if t.pnl > 0]
                 stats = dict(capital=self.env_state['capital'],
-                             pos_trades=[t for t in self.env_state['trades'] if t.pnl > 0])
+                             pos_trades=len(pos_trades))
                 stats['trade_capital_ratio'] = stats['capital'] * (stats['pos_trades'] ** 1/24)
 
                 self.stats = stats

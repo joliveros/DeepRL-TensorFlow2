@@ -88,9 +88,6 @@ class WorkerAgent(Thread):
         capital = None
 
         while self.max_episodes >= CUR_EPISODE:
-            state_batch = []
-            action_batch = []
-            reward_batch = []
             episode_reward, done = 0, False
 
             state = self.env.reset()
