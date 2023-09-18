@@ -21,6 +21,7 @@ class Agent:
         self.trial = None
         self.kwargs = kwargs
         self.env_kwargs = env_kwargs
+
         env = gym.make(env_name,
                        worker_name='agent',
                        custom_summary_keys=['worker_name'],
@@ -69,6 +70,7 @@ class Agent:
                 self.global_critic,
                 self.max_episodes,
                 trial=trial,
+                run_eval= i==0,
                 env_name=self.env_name,
                 env_kwargs=self.env_kwargs,
                 name=f'worker_{i}',
@@ -77,20 +79,13 @@ class Agent:
         for worker in workers:
             worker.start()
 
-        capital = []
-        trades = []
+        result = None
 
         for worker in workers:
             worker.join()
-            capital.append(worker.env_state['capital'])
-            trades.append([trade for trade in
-                           worker.env_state['trades'] if trade.pnl > 0])
+            if worker.eval_agent:
+                result = worker.eval_agent.stats['trade_capital_ratio']
 
         wandb.finish()
 
-        if len(trades) > 0:
-            trade_value = len(trades) ** (1/24)
-        else:
-            trade_value = 0
-
-        return mean(capital) + trade_value
+        return result

@@ -18,7 +18,7 @@ class Actor:
             **kwargs
         )
 
-        print(model.summary())
+        # print(model.summary())
         return model
 
     def compute_loss(self, actions, logits, advantages):

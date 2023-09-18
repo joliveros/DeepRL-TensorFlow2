@@ -10,6 +10,7 @@ from optuna import TrialPruned
 
 from A3C.actor import Actor
 from A3C.critic import Critic
+from A3C.eval_agent import EvalAgent
 
 CUR_EPISODE = 0
 
@@ -20,25 +21,28 @@ class WorkerAgent(Thread):
                  cache_len=1000,
                  env_name=None,
                  name=None,
+                 run_eval=False,
                  env_kwargs=None, trial=None, **kwargs):
 
         Thread.__init__(self, name=name)
 
         global CUR_EPISODE
         CUR_EPISODE=0
-
+        self.eval_agent = None
+        self.run_eval = run_eval
         self.env_state = dict()
         self.trial = trial
         self.batch_size = batch_size
         self.gamma = gamma
         self.update_interval = update_interval
         self.n_steps = 0
+        self.cache = deque(maxlen=cache_len)
         self.lock = Lock()
+
         self.env = gym.make(env_name,
                             worker_name=self.name,
                             custom_summary_keys=['worker_name'],
                             **env_kwargs)
-
         self.state_dim = self.env.observation_space.shape
         self.action_dim = self.env.action_space.n
 
@@ -51,7 +55,12 @@ class WorkerAgent(Thread):
         self.actor.model.set_weights(self.global_actor.model.get_weights())
         self.critic.model.set_weights(self.global_critic.model.get_weights())
 
-        self.cache = deque(maxlen=cache_len)
+        if self.run_eval:
+            self.eval_agent = EvalAgent(
+                actor=self.actor,
+                steps=0,
+                env_name=env_name,
+                env_kwargs=env_kwargs, **kwargs)
 
     def n_step_td_target(self, rewards, next_v_value, done):
         td_targets = np.zeros_like(rewards)
@@ -93,9 +102,6 @@ class WorkerAgent(Thread):
                 probs = self.actor.model.predict(np.asarray([state]))
 
                 action = np.argmax(probs[0])
-
-                # action = np.random.choice(self.action_dim, p=probs[0])
-                # alog.info((action, probs))
 
                 next_state, reward, done, _ = self.env.step(action)
 
@@ -150,6 +156,9 @@ class WorkerAgent(Thread):
 
                 episode_reward += reward[0][0]
                 state = next_state[0]
+                
+            if self.eval_agent:
+                self.eval_agent.eval()
 
             print('EP{} EpisodeReward={}'.format(CUR_EPISODE, episode_reward))
             wandb.log({'Reward': episode_reward})
