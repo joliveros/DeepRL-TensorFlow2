@@ -4,16 +4,20 @@ import alog
 import gym
 import numpy as np
 import wandb
+from optuna import TrialPruned, Trial
+
 
 class EvalAgent:
     def __init__(
             self,
+            trial,
             test_interval,
             env_name,
             env_kwargs,
             actor,
             **kwargs):
 
+        self.trial: Trial = trial
         self._env_kwargs = None
         self.steps = 0
         self.actor = actor
@@ -55,7 +59,7 @@ class EvalAgent:
         self.steps = 0
         return self.env.reset()
 
-    def eval(self):
+    def eval(self, step):
         state = self.env.reset()
         eval_done = False
 
@@ -84,6 +88,13 @@ class EvalAgent:
 
                 self.stats = stats
                 wandb.log(stats)
+
+                self.trial.report(stats['trade_capital_ratio'], step)
+
+                if self.trial.should_prune():
+                    wandb.run.summary["state"] = "pruned"
+                    wandb.finish(quiet=True)
+                    raise TrialPruned()
 
 
 

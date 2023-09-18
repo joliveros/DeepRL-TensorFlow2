@@ -57,6 +57,7 @@ class WorkerAgent(Thread):
 
         if self.run_eval:
             self.eval_agent = EvalAgent(
+                trial=self.trial,
                 actor=self.actor,
                 steps=0,
                 env_name=env_name,
@@ -155,16 +156,11 @@ class WorkerAgent(Thread):
                 state = next_state[0]
                 
             if self.eval_agent:
-                self.eval_agent.eval()
+                self.eval_agent.eval(CUR_EPISODE)
 
             print('EP{} EpisodeReward={}'.format(CUR_EPISODE, episode_reward))
             wandb.log({'Reward': episode_reward})
             CUR_EPISODE += 1
-
-            if self.trial.should_prune():
-                wandb.run.summary["state"] = "pruned"
-                wandb.finish(quiet=True)
-                raise TrialPruned()
 
         wandb.run.summary["final capital"] = self.env_state['capital']
         wandb.run.summary["state"] = "completed"
