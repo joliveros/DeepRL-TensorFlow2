@@ -23,28 +23,28 @@ parser.add_argument('--critic_lr', type=float, default=0.0005)
 parser.add_argument('--offline', '-o', action='store_true')
 
 env_kwargs = dict(
+    base_filter_size=91,
+    cache=True,
     database_name='binance_futures',
     depth=24,
-    sequence_length=48,
+    flat_class_str='NoRewardFlatTrade',
+    group_by='1m',
     interval='6h',
+    leverage=2,
+    max_negative_pnl=-0.99,
+    min_change=-0.04,
+    min_flat_position_length=0,
+    min_position_length=0,
+    offset_interval='1h',
+    random_frame_start=True,
+    round_decimals=3,
+    sequence_length=48,
+    short_class_str='ShortRewardPnlDiffTrade',
+    summary_interval=8,
+    symbol='UNFIUSDT',
     test_interval='1h',
     test_offset_interval='0h',
-    symbol='UNFIUSDT',
-    window_size='4m',
-    group_by='1m',
-    cache=True,
-    leverage=2,
-    offset_interval='1h',
-    max_negative_pnl=-0.99,
-    summary_interval=8,
-    round_decimals=3,
-    min_position_length=0,
-    min_flat_position_length=0,
-    min_change=-0.04,
-    short_class_str='ShortRewardPnlDiffTrade',
-    flat_class_str='NoRewardFlatTrade',
-    random_frame_start=True,
-    base_filter_size=91
+    window_size='4m'
 )
 
 
