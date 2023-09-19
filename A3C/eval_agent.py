@@ -7,6 +7,7 @@ import numpy as np
 import wandb
 from optuna import TrialPruned, Trial
 
+
 @dataclass
 class EvalStats:
     capital: float
@@ -14,7 +15,13 @@ class EvalStats:
 
     @property
     def trade_capital_ratio(self):
-       return (self.capital + (self.pos_trades ** 1 / 24) - 1)
+        return self.capital + (self.pos_trades ** 1 / 24) - 1
+
+    @property
+    def __dict__(self):
+        return dict(capital=self.capital,
+                    pos_trades=self.pos_trades,
+                    trade_capital_ratio=self.trade_capital_ratio)
 
 
 class EvalAgent:
@@ -45,7 +52,6 @@ class EvalAgent:
         )
         self.state_dim = self.env.observation_space.shape
         self.action_dim = self.env.action_space.n
-
 
     def set_env_kwargs(self, value):
         self._env_kwargs = self.set_offset_interval(value)
@@ -93,8 +99,9 @@ class EvalAgent:
                 eval_done = done
                 pos_trades = [t for t in self.env_state['trades'] if t.pnl > 0]
                 self.stats = EvalStats(capital=self.env_state['capital'],
-                             pos_trades=len(pos_trades))
-                wandb.log(self.stats)
+                                       pos_trades=len(pos_trades))
+
+                wandb.log(self.stats.__dict__)
 
                 self.trial.report(self.stats.trade_capital_ratio, step)
 
