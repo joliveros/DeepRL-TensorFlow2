@@ -164,7 +164,6 @@ class WorkerAgent(Thread):
 
         wandb.run.summary["final capital"] = self.env_state['capital']
         wandb.run.summary["state"] = "completed"
-        wandb.finish(quiet=True)
 
     def run(self):
         return self.train()

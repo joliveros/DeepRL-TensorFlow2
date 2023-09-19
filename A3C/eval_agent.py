@@ -107,5 +107,5 @@ class EvalAgent:
 
                 if self.trial.should_prune():
                     wandb.run.summary["state"] = "pruned"
-                    wandb.finish(quiet=True)
+                    wandb.finish()
                     raise TrialPruned()
