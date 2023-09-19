@@ -15,7 +15,7 @@ class Critic:
             **kwargs
         )
 
-        # print(model.summary())
+        print(model.summary())
 
         dense = Dense(1, activation='linear')(model.output)
 
