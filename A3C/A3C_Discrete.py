@@ -23,7 +23,7 @@ parser.add_argument('--critic_lr', type=float, default=0.0005)
 parser.add_argument('--offline', '-o', action='store_true')
 
 env_kwargs = dict(
-    base_filter_size=64,
+    base_filter_size=84,
     cache=True,
     database_name='binance_futures',
     depth=24,
@@ -32,7 +32,7 @@ env_kwargs = dict(
     interval='6h',
     leverage=2,
     max_negative_pnl=-0.99,
-    min_change=-0.04,
+    min_change=-0.01,
     min_flat_position_length=0,
     min_position_length=0,
     offset_interval='1h',
@@ -46,7 +46,7 @@ env_kwargs = dict(
     test_offset_interval='0h',
     window_size='4m',
     kernel=1,
-    block_kernel=2,
+    block_kernel=5,
     cache_len=100,
     num_conv=16
 )
