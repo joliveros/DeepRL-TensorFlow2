@@ -99,6 +99,8 @@ class WorkerAgent(Thread):
 
                 probs = self.actor.model.predict(np.asarray([state]))
 
+                alog.info(probs)
+
                 action = np.random.choice(self.action_dim, p=probs[0])
 
                 # action = np.argmax(probs[0])
