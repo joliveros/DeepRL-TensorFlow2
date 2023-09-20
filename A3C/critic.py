@@ -1,6 +1,7 @@
 import tensorflow as tf
 from exchange_data.models.resnet.model import Model
 from tensorflow.keras.layers import Dense
+import alog
 
 class Critic:
     def __init__(self, state_dim, critic_lr, **kwargs):

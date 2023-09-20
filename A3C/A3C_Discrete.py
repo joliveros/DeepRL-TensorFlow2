@@ -39,12 +39,16 @@ env_kwargs = dict(
     random_frame_start=True,
     round_decimals=3,
     sequence_length=48,
-    short_class_str='ShortRewardPnlDiffTrade',
+    short_class_str='ShortTrade',
     summary_interval=8,
     symbol='UNFIUSDT',
     test_interval='1h',
     test_offset_interval='0h',
-    window_size='4m'
+    window_size='4m',
+    kernel=1,
+    block_kernel=2,
+    cache_len=100,
+    num_conv=16
 )
 
 
