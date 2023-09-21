@@ -119,7 +119,9 @@ class WorkerAgent(Thread):
                 if done:
                     wandb.log({'train_capital': self.env_state['capital']})
 
-                if self.n_steps % self.update_interval == 0 or done:
+                if (self.n_steps % self.update_interval == 0 or done) and \
+                    len(self.cache)> self.batch_size:
+
                     states = []
                     actions = []
                     rewards = []

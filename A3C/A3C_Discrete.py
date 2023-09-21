@@ -10,6 +10,7 @@ import argparse
 WANDB_API_KEY = sec.load('WANDB_API_KEY', lowercase=False)
 wandb.login(key=WANDB_API_KEY)
 
+tf.compat.v1.reset_default_graph()
 tf.keras.backend.set_floatx('float64')
 
 parser = argparse.ArgumentParser()
@@ -23,23 +24,25 @@ parser.add_argument('--critic_lr', type=float, default=0.0005)
 parser.add_argument('--offline', '-o', action='store_true')
 
 env_kwargs = dict(
-    base_filter_size=84,
+    base_filter_size=32,
     cache=True,
     database_name='binance_futures',
     depth=24,
-    flat_class_str='NoRewardFlatTrade',
+    # flat_class_str='NoRewardFlatTrade',
+    flat_class_str='FlatTrade',
     group_by='1m',
     interval='6h',
     leverage=2,
     max_negative_pnl=-0.99,
-    min_change=-0.01,
+    min_change=-0.04,
     min_flat_position_length=0,
     min_position_length=0,
     offset_interval='1h',
     random_frame_start=True,
     round_decimals=3,
     sequence_length=48,
-    short_class_str='ShortRewardPnlDiffTrade',
+    # short_class_str='ShortRewardPnlDiffTrade',
+    short_class_str='ShortTrade',
     summary_interval=8,
     symbol='UNFIUSDT',
     test_interval='1h',
@@ -47,7 +50,7 @@ env_kwargs = dict(
     window_size='4m',
     kernel=1,
     block_kernel=5,
-    cache_len=100,
+    cache_len=500,
     num_conv=16
 )
 
