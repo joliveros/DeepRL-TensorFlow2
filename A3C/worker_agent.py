@@ -112,12 +112,14 @@ class WorkerAgent(Thread):
     def step(self, CUR_EPISODE, done, state):
         if state is None:
             state = np.zeros(self.state_dim)
-        if CUR_EPISODE > 1:
+
+        if CUR_EPISODE > 3:
             probs = self.actor.model.predict(np.asarray([state]))
             alog.info(probs)
             action = np.random.choice(self.action_dim, p=probs[0])
         else:
             action = np.random.choice(self.action_dim, p=[0.2, 0.8])
+
         # action = np.argmax(probs[0])
         next_state, reward, done, _ = self.env.step(action)
         self.env_state = _
