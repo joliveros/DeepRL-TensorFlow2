@@ -26,6 +26,7 @@ class WorkerAgent(Thread):
 
         Thread.__init__(self, name=name)
 
+        self.last_action = None
         global CUR_EPISODE
         CUR_EPISODE=0
         self.eval_agent = None
@@ -117,11 +118,18 @@ class WorkerAgent(Thread):
             probs = self.actor.model.predict(np.asarray([state]))
             alog.info(probs)
             action = np.random.choice(self.action_dim, p=probs[0])
+            self.last_action = action
         else:
-            action = np.random.choice(self.action_dim, p=[0.2, 0.8])
+            if self.n_steps % 10 == 0:
+                action = np.random.choice(self.action_dim, p=[0.2, 0.8])
+                self.last_action = action
+            else:
+                action = self.last_action
 
         # action = np.argmax(probs[0])
+
         next_state, reward, done, _ = self.env.step(action)
+
         self.env_state = _
         state = np.asarray([state])
         action = np.reshape(action, [1, 1])
