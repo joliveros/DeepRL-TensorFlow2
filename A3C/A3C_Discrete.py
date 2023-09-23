@@ -28,8 +28,8 @@ env_kwargs = dict(
     cache=True,
     database_name='binance_futures',
     depth=24,
-    flat_class_str='FlatTrade',
-    # flat_class_str='NoRewardFlatTrade',
+    # flat_class_str='FlatTrade',
+    flat_class_str='NoRewardFlatTrade',
     # flat_class_str='FlatRewardPnlDiffTrade',
     group_by='1m',
     interval='12h',
@@ -50,9 +50,9 @@ env_kwargs = dict(
     test_offset_interval='0h',
     window_size='4m',
     kernel=1,
-    block_kernel=7,
+    block_kernel=4,
     cache_len=200,
-    num_conv=16
+    num_conv=19
 )
 
 
