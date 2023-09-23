@@ -113,7 +113,7 @@ class WorkerAgent(Thread):
         if state is None:
             state = np.zeros(self.state_dim)
 
-        if CUR_EPISODE > 3:
+        if CUR_EPISODE > 1:
             probs = self.actor.model.predict(np.asarray([state]))
             alog.info(probs)
             action = np.random.choice(self.action_dim, p=probs[0])
@@ -128,11 +128,11 @@ class WorkerAgent(Thread):
         next_state = np.asarray([next_state])
         reward = np.reshape(reward, [1, 1])
         self.cache.append([state, action, reward])
+
         if done:
             wandb.log({'train_capital': self.env_state['capital']})
-        if (self.n_steps % self.update_interval == 0 or done) and \
-                len(self.cache) > self.batch_size:
 
+        if self.n_steps % self.update_interval == 0:
             states = []
             actions = []
             rewards = []
@@ -154,6 +154,7 @@ class WorkerAgent(Thread):
             advantages = td_targets - self.critic.model.predict(states)
 
             with self.lock:
+                alog.info('### training ###')
                 actor_loss = self.global_actor.train(
                     states, actions, advantages)
                 critic_loss = self.global_critic.train(
@@ -167,7 +168,7 @@ class WorkerAgent(Thread):
             wandb.log(dict(actor_loss=actor_loss.numpy(),
                            critic_loss=critic_loss.numpy()))
 
-            self.n_steps += 1
+        self.n_steps += 1
 
         return done, next_state, reward
 

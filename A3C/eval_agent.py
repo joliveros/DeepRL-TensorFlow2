@@ -85,8 +85,11 @@ class EvalAgent:
                 alog.debug('## state is None ##')
 
             probs = self.actor.model.predict(np.asarray([state]))
+            alog.info(probs)
+            action = np.random.choice(self.action_dim, p=probs[0])
 
-            action = np.argmax(probs[0])
+            # probs = self.actor.model.predict(np.asarray([state]))
+            # action = np.argmax(probs[0])
 
             next_state, reward, done, _ = self.env.step(action)
 
