@@ -32,6 +32,7 @@ class EvalAgent:
             env_name,
             env_kwargs,
             actor,
+            action_repetition,
             **kwargs):
 
         self.trial: Trial = trial
@@ -40,6 +41,8 @@ class EvalAgent:
         self.actor = actor
         self.stats: EvalStats = None
         self.test_interval = test_interval
+        self.action_repetition = action_repetition
+        self.last_action = None
 
         self.env_kwargs = copy(env_kwargs)
 
@@ -82,11 +85,14 @@ class EvalAgent:
         while not eval_done:
             if state is None:
                 state = np.zeros(self.state_dim)
-                alog.debug('## state is None ##')
 
-            probs = self.actor.model.predict(np.asarray([state]))
-            alog.info(probs)
-            action = np.random.choice(self.action_dim, p=probs[0])
+            if self.steps % 10 == 0:
+                probs = self.actor.model.predict(np.asarray([state]))
+                alog.info(probs)
+                action = np.random.choice(self.action_dim, p=probs[0])
+                self.last_action = action
+            else:
+                action = self.last_action
 
             # probs = self.actor.model.predict(np.asarray([state]))
             # action = np.argmax(probs[0])

@@ -18,6 +18,7 @@ class WorkerAgent(Thread):
     def __init__(self, global_actor, global_critic,
                  max_episodes,
                  gamma, update_interval, batch_size,
+                 action_repetition,
                  cache_len=1000,
                  env_name=None,
                  name=None,
@@ -29,6 +30,7 @@ class WorkerAgent(Thread):
         self.last_action = None
         global CUR_EPISODE
         CUR_EPISODE=0
+        self.action_repetition = action_repetition
         self.eval_agent = None
         self.run_eval = run_eval
         self.env_state = dict()
@@ -61,6 +63,7 @@ class WorkerAgent(Thread):
                 trial=self.trial,
                 actor=self.actor,
                 steps=0,
+                action_repetition=action_repetition,
                 env_name=env_name,
                 env_kwargs=env_kwargs, **kwargs)
 
@@ -116,16 +119,18 @@ class WorkerAgent(Thread):
 
         if CUR_EPISODE > 1:
             probs = self.actor.model.predict(np.asarray([state]))
-            alog.info(probs)
-            action = np.random.choice(self.action_dim, p=probs[0])
-            self.last_action = action
-        else:
-            if self.n_steps % 10 == 0:
-                action = np.random.choice(self.action_dim, p=[0.2, 0.8])
+            # alog.info(probs)
+            if self.n_steps % self.action_repetition == 0:
+                alog.info(self.n_steps)
+                action = np.random.choice(self.action_dim, p=probs[0])
                 self.last_action = action
             else:
                 action = self.last_action
+        else:
+            action = np.random.choice(self.action_dim, p=[0.1, 0.9])
+            self.last_action = action
 
+            
         # action = np.argmax(probs[0])
 
         next_state, reward, done, _ = self.env.step(action)
