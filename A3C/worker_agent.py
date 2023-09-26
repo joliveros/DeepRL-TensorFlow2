@@ -121,7 +121,6 @@ class WorkerAgent(Thread):
             probs = self.actor.model.predict(np.asarray([state]))
             # alog.info(probs)
             if self.n_steps % self.action_repetition == 0:
-                alog.info(self.n_steps)
                 action = np.random.choice(self.action_dim, p=probs[0])
                 self.last_action = action
             else:
