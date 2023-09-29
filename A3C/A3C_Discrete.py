@@ -25,18 +25,18 @@ parser.add_argument('--critic_lr', type=float, default=0.0005)
 parser.add_argument('--offline', '-o', action='store_true')
 
 env_kwargs = dict(
-    base_filter_size=32,
+    base_filter_size=24,
     cache=True,
     database_name='binance_futures',
     depth=96,
-    # flat_class_str='FlatTrade',
-    flat_class_str='NoRewardFlatTrade',
+    flat_class_str='FlatTrade',
+    # flat_class_str='NoRewardFlatTrade',
     # flat_class_str='FlatRewardPnlDiffTrade',
     group_by='5m',
     interval='48h',
     leverage=2,
     max_negative_pnl=-0.99,
-    min_change=-0.04,
+    min_change=-0.99,
     min_flat_position_length=0,
     min_position_length=0,
     offset_interval='1h',
@@ -49,10 +49,10 @@ env_kwargs = dict(
     symbol='UNFIUSDT',
     test_interval='1h',
     test_offset_interval='0h',
-    window_size='4m',
-    kernel=2,
-    block_kernel=7,
-    cache_len=1000,
+    window_size='30m',
+    kernel=1,
+    block_kernel=9,
+    cache_len=5000,
     num_conv=19,
 )
 
