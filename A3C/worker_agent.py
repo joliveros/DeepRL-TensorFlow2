@@ -96,7 +96,7 @@ class WorkerAgent(Thread):
         while self.max_episodes >= CUR_EPISODE:
             episode_reward, done = 0, False
 
-            state = self.env.reset()
+            state = self.env.reset()[0]
 
             while not done:
                 done, next_state, reward = \
@@ -120,7 +120,7 @@ class WorkerAgent(Thread):
             state = np.zeros(self.state_dim)
 
         if CUR_EPISODE > 1:
-            probs = self.actor.model.predict(np.asarray([state]))
+            probs = self.actor.model.predict(state)
             # alog.info(probs)
             if self.n_steps % self.action_repetition == 0:
                 action = np.random.choice(self.action_dim, p=probs[0])
@@ -137,9 +137,8 @@ class WorkerAgent(Thread):
         next_state, reward, done, _ = self.env.step(action)
 
         self.env_state = _
-        state = np.asarray([state])
+
         action = np.reshape(action, [1, 1])
-        next_state = np.asarray([next_state])
         reward = np.reshape(reward, [1, 1])
         self.cache.append([state, action, reward])
 
@@ -154,7 +153,7 @@ class WorkerAgent(Thread):
             for i in range(0, self.batch_size):
                 ix = np.random.randint(0, cache_len)
                 state, action, reward = self.cache[ix]
-                states.append(state[0])
+                states.append(state)
                 actions.append(action[0])
                 rewards.append(reward[0])
 
@@ -165,6 +164,7 @@ class WorkerAgent(Thread):
             next_v_value = self.critic.model.predict(next_state)
             td_targets = self.n_step_td_target(
                 rewards, next_v_value, done)
+
             advantages = td_targets - self.critic.model.predict(states)
 
             with self.lock:
