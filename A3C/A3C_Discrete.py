@@ -53,7 +53,7 @@ env_kwargs = dict(
     kernel=1,
     block_kernel=9,
     cache_len=5000,
-    num_conv=19,
+    num_conv=24,
 )
 
 
