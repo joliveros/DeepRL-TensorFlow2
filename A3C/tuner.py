@@ -1,6 +1,7 @@
 import alog
 from exchange_data.models.study_wrapper import StudyWrapper
 from .agent import Agent
+from .convnext import model
 
 
 class Tuner(StudyWrapper):
@@ -15,6 +16,6 @@ class Tuner(StudyWrapper):
 
         StudyWrapper.__init__(self, **kwargs)
 
-        self.agent = Agent(env_name, env_kwargs, **kwargs)
+        self.agent = Agent(env_name, env_kwargs, model_fn=model, **kwargs)
 
         self.study.optimize(self.agent.train, n_trials=1000)

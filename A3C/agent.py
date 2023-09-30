@@ -13,7 +13,8 @@ import tgym.envs
 
 class Agent:
     def __init__(self, env_name, env_kwargs, num_workers,
-                 max_episodes, offline, **kwargs):
+                 max_episodes, offline, model_fn, **kwargs):
+        self.model_fn = model_fn
         self.offline = offline
         self.global_critic = None
         self.global_actor = None
@@ -59,8 +60,9 @@ class Agent:
         )
 
         self.global_actor = Actor(self.state_dim, self.action_dim,
+                                  model_fn=self.model_fn,
                                   **self.kwargs)
-        self.global_critic = Critic(self.state_dim, **self.kwargs)
+        self.global_critic = Critic(self.state_dim, model_fn=self.model_fn, **self.kwargs)
 
         workers = []
 
@@ -69,6 +71,7 @@ class Agent:
                 self.global_actor,
                 self.global_critic,
                 self.max_episodes,
+                model_fn=self.model_fn,
                 trial=trial,
                 # run_eval= i==0,
                 run_eval=False,

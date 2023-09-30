@@ -17,6 +17,7 @@ CUR_EPISODE = 0
 class WorkerAgent(Thread):
     def __init__(self, global_actor, global_critic,
                  max_episodes,
+                 model_fn,
                  gamma, update_interval, batch_size,
                  action_repetition,
                  cache_len=1000,
@@ -30,6 +31,7 @@ class WorkerAgent(Thread):
         self.last_action = None
         global CUR_EPISODE
         CUR_EPISODE=0
+        self.model_fn = model_fn
         self.action_repetition = action_repetition
         self.eval_agent = None
         self.run_eval = run_eval
@@ -52,8 +54,8 @@ class WorkerAgent(Thread):
         self.max_episodes = max_episodes
         self.global_actor = global_actor
         self.global_critic = global_critic
-        self.actor = Actor(self.state_dim, self.action_dim, **kwargs)
-        self.critic = Critic(self.state_dim, **kwargs)
+        self.actor = Actor(self.state_dim, self.action_dim, model_fn=self.model_fn, **kwargs)
+        self.critic = Critic(self.state_dim, model_fn=self.model_fn, **kwargs)
 
         self.actor.model.set_weights(self.global_actor.model.get_weights())
         self.critic.model.set_weights(self.global_critic.model.get_weights())

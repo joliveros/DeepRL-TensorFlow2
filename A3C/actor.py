@@ -3,7 +3,8 @@ import tensorflow as tf
 from exchange_data.models.resnet.model import Model
 
 class Actor:
-    def __init__(self, state_dim, action_dim, actor_lr, **kwargs):
+    def __init__(self, state_dim, action_dim, actor_lr, model_fn, **kwargs):
+        self.model_fn = model_fn
         self.actor_lr = actor_lr
         self.state_dim = state_dim
         self.action_dim = action_dim
@@ -12,7 +13,7 @@ class Actor:
         self.entropy_beta = 0.01
 
     def create_model(self, **kwargs):
-        model = Model(
+        model = self.model_fn(
             input_shape=self.state_dim,
             **kwargs
         )

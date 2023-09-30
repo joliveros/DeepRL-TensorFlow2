@@ -3,15 +3,17 @@ from exchange_data.models.resnet.model import Model
 from tensorflow.keras.layers import Dense
 import alog
 
+
 class Critic:
-    def __init__(self, state_dim, critic_lr, **kwargs):
+    def __init__(self, state_dim, critic_lr, model_fn, **kwargs):
+        self.model_fn = model_fn
         self.critic_lr = critic_lr
         self.state_dim = state_dim
         self.model = self.create_model(**kwargs)
         self.opt = tf.keras.optimizers.Adam(self.critic_lr)
 
     def create_model(self, **kwargs):
-        model = Model(
+        model = self.model_fn(
             input_shape=self.state_dim,
             **kwargs
         )
