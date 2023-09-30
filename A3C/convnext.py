@@ -8,7 +8,7 @@ def model(input_shape, **kwargs):
     inputs = Input(shape=input_shape)
 
     x = tf.keras.applications.inception_resnet_v2 \
-         .preprocess_input(inputs)
+        .preprocess_input(inputs)
 
     model = tf.keras.applications.inception_resnet_v2.InceptionResNetV2(
         include_top=False,
@@ -27,10 +27,9 @@ def model(input_shape, **kwargs):
     x = model(x)
 
     x = GlobalAveragePooling2D()(x)
-    # let's add a fully-connected layer
+
     x = Dense(1024, activation='relu')(x)
-    # and a logistic layer -- let's say we have 200 classes
+
     predictions = Dense(2, activation='softmax')(x)
 
     return Model(inputs=inputs, outputs=predictions)
-
