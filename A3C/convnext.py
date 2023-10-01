@@ -12,10 +12,7 @@ def model(input_shape, **kwargs):
 
     model = tf.keras.applications.inception_resnet_v2.InceptionResNetV2(
         include_top=False,
-        # include_preprocessing=False,
         weights='imagenet',
-        # input_tensor=x,
-        # input_shape=input_shape,
         pooling=None,
         classes=2,
         classifier_activation='softmax'
