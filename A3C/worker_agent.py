@@ -119,16 +119,21 @@ class WorkerAgent(Thread):
         if state is None:
             state = np.zeros(self.state_dim)
 
-        if CUR_EPISODE > 1:
-            probs = self.actor.model.predict(np.asarray([state]))
-            # alog.info(probs)
+        probs = self.actor.model.predict(np.asarray([state]))
+
+        alog.info(probs[0])
+
+        if CUR_EPISODE > 3:
             if self.n_steps % self.action_repetition == 0:
-                action = np.random.choice(self.action_dim, p=probs[0])
+                action = np.argmax(probs[0])
+                # action = np.random.choice(self.action_dim, p=probs[0])
                 self.last_action = action
             else:
                 action = self.last_action
         else:
-            action = np.random.choice(self.action_dim, p=[0.1, 0.9])
+            # action = np.random.choice(self.action_dim, p=probs[0])
+            # self.last_action = action
+            action = np.random.choice(self.action_dim, p=[0.2, 0.8])
             self.last_action = action
 
             

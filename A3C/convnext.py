@@ -13,7 +13,7 @@ def model(input_shape, **kwargs):
     model = tf.keras.applications.inception_resnet_v2.InceptionResNetV2(
         include_top=False,
         weights='imagenet',
-        pooling=None,
+        pooling='max',
         classes=2,
         classifier_activation='softmax'
     )
@@ -23,9 +23,10 @@ def model(input_shape, **kwargs):
 
     x = model(x)
 
-    x = GlobalAveragePooling2D()(x)
+    # x = GlobalAveragePooling2D()(x)
 
-    x = Dense(1024, activation='relu')(x)
+    # x = Dense(1024, activation='relu')(x)
+    x = Dense(16, activation='relu')(x)
 
     predictions = Dense(2, activation='softmax')(x)
 

@@ -37,10 +37,6 @@ class Actor:
             logits = self.model(states, training=True)
             loss = self.compute_loss(
                 actions, logits, advantages)
-        # alog.info([states, actions])
-        # alog.info([loss, self.model.trainable_variables])
-
-        # alog.info(loss)
 
         grads = tape.gradient(loss, self.model.trainable_variables)
         self.opt.apply_gradients(zip(grads, self.model.trainable_variables))
