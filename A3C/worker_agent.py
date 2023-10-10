@@ -123,7 +123,7 @@ class WorkerAgent(Thread):
 
         alog.info(probs[0])
 
-        if CUR_EPISODE > 3:
+        if CUR_EPISODE > 1:
             if self.n_steps % self.action_repetition == 0:
                 action = np.argmax(probs[0])
                 # action = np.random.choice(self.action_dim, p=probs[0])
@@ -131,9 +131,8 @@ class WorkerAgent(Thread):
             else:
                 action = self.last_action
         else:
-            # action = np.random.choice(self.action_dim, p=probs[0])
-            # self.last_action = action
-            action = np.random.choice(self.action_dim, p=[0.2, 0.8])
+            action = np.random.choice(self.action_dim, p=probs[0])
+            # action = np.random.choice(self.action_dim, p=[0.2, 0.8])
             self.last_action = action
 
             
