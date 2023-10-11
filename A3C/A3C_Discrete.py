@@ -25,9 +25,9 @@ parser.add_argument('--critic_lr', type=float, default=0.0005)
 parser.add_argument('--offline', '-o', action='store_true')
 
 env_kwargs = dict(
-    frame_width=410,
+    frame_width=219,
     base_filter_size=24,
-    cache=True,
+    cache=False,
     database_name='binance_futures',
     # flat_class_str='FlatTrade',
     # flat_class_str='NoRewardFlatTrade',
